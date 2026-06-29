@@ -74,13 +74,13 @@ const DoctorDashboard = ({ user, logout }) => {
   }
 
   return (
-    <div className="flex min-h-screen bg-[#f8fafc] dark:bg-slate-950 transition-colors">
-      <Sidebar role="doctor" onLogout={logout} />
+    <div className="relative flex h-screen overflow-hidden medical-gradient-bg dark:bg-slate-950 transition-colors">
+      <Sidebar role="doctor" onLogout={logout} className="relative z-10" />
 
-      <div className="flex-grow flex flex-col min-w-0">
+      <div className="flex-grow flex flex-col h-screen overflow-hidden min-w-0 relative z-10">
         <TopNav userName={user?.name || "Dr. User"} role="doctor" />
 
-        <main className="p-4 sm:p-6 lg:p-8">
+        <main className="p-4 sm:p-6 lg:p-8 flex-grow overflow-y-auto custom-scrollbar">
           <Routes>
             <Route index element={<DoctorOverview user={user} />} />
             <Route path="queue" element={<AppointmentQueue user={user} />} />
