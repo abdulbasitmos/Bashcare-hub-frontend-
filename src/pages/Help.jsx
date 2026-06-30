@@ -10,20 +10,6 @@ import { useGlobalSettings } from '../context/GlobalSettingsContext';
 const Help = () => {
   const { t } = useGlobalSettings();
   const [openIndex, setOpenIndex] = useState(null);
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
-
-  const backgroundImages = [
-    "https://images.unsplash.com/photo-1576091160550-2173bdd9962a?auto=format&fit=crop&q=80&w=2000",
-    "https://images.unsplash.com/photo-1584432810601-6c7f27d2362b?auto=format&fit=crop&q=80&w=2000",
-    "https://images.unsplash.com/photo-1551601651-2a8555f1a136?auto=format&fit=crop&q=80&w=2000"
-  ];
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentImageIndex((prevIndex) => (prevIndex + 1) % backgroundImages.length);
-    }, 3000);
-    return () => clearInterval(interval);
-  }, [backgroundImages.length]);
 
   const faqs = [
     {
@@ -52,34 +38,12 @@ const Help = () => {
     <div className="min-h-screen bg-[var(--bg-secondary)]">
       <Navbar />
       
-      {/* Hero Cycling Background Images */}
-      <div className="relative h-[400px] overflow-hidden">
-        <div className="absolute inset-0 z-0">
-          <AnimatePresence mode="wait">
-            <motion.img
-              key={currentImageIndex}
-              src={backgroundImages[currentImageIndex]}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 1 }}
-              className="w-full h-full object-cover"
-              alt="Background"
-            />
-          </AnimatePresence>
-          {/* Overlay for readability */}
-          <div className="absolute inset-0 bg-[var(--bg-secondary)]/70 backdrop-blur-[2px]"></div>
-        </div>
-        
-        <div className="relative z-10">
-          <PageHeader 
-            title={t('Help & Support')} 
-            subtitle={t('Find answers to your questions or get in touch with our team.')}
-            breadcrumb={t('help')}
-            videoUrl="/videos/services_bg.mp4"
-          />
-        </div>
-      </div>
+      <PageHeader 
+        title={t('Help & Support')} 
+        subtitle={t('Find answers to your questions or get in touch with our team.')}
+        breadcrumb={t('help')}
+        videoUrl="/videos/help_bg.mp4"
+      />
       
       <main className="py-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="lg:grid lg:grid-cols-3 gap-16">

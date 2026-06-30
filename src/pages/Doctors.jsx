@@ -189,11 +189,11 @@ const Doctors = () => {
           loop 
           muted 
           playsInline 
-          className="absolute inset-0 w-full h-full object-cover opacity-75 z-0"
+          className="absolute inset-0 w-full h-full object-cover z-0"
         >
-          <source src="/videos/services_bg.mp4" type="video/mp4" />
+          <source src="/videos/doctor_bg.mp4" type="video/mp4" />
         </video>
-        <div className="absolute inset-0 bg-white/75 dark:bg-slate-950/70 backdrop-blur-[0.5px] z-0 transition-colors duration-300" />
+
         {/* decorative blobs */}
         <div className="absolute top-0 left-0 w-96 h-96 bg-blue-100/30 dark:bg-white/5 rounded-full -translate-x-1/2 -translate-y-1/2 blur-3xl z-0" />
         <div className="absolute bottom-0 right-0 w-80 h-80 bg-cyan-100/30 dark:bg-cyan-900/10 rounded-full translate-x-1/3 translate-y-1/3 blur-3xl z-0" />

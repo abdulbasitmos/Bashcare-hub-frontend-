@@ -11,11 +11,10 @@ const PageHeader = ({ title, subtitle, breadcrumb, videoUrl }) => {
             loop 
             muted 
             playsInline 
-            className="absolute inset-0 w-full h-full object-cover opacity-75 z-0"
+            className="absolute inset-0 w-full h-full object-cover z-0"
           >
             <source src={videoUrl} type="video/mp4" />
           </video>
-          <div className="absolute inset-0 bg-white/75 dark:bg-slate-950/70 backdrop-blur-[0.5px] z-0 transition-colors duration-300" />
         </>
       )}
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center z-10">

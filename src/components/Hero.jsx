@@ -92,12 +92,12 @@ const Hero = () => {
       <motion.div 
         className="absolute top-0 right-0 w-[600px] h-[400px] md:h-[500px] bg-blue-100/60  rounded-full blur-[150px] opacity-60"
         animate={{ x: [0, 100, 0], y: [0, 50, 0] }}
-        transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
+        transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
       />
       <motion.div 
         className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-indigo-100/60  rounded-full blur-[120px] opacity-60"
         animate={{ x: [0, -50, 0], y: [0, 100, 0] }}
-        transition={{ duration: 25, repeat: Infinity, ease: "easeInOut" }}
+        transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
       />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
@@ -222,7 +222,7 @@ const Hero = () => {
              {/* Floating Card 1: Top Left (Rating) */}
             <motion.div
               animate={{ y: [0, -12, 0] }}
-              transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+              transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
               className="absolute -top-6 -left-6 bg-white/90  backdrop-blur-md p-4 rounded-2xl shadow-xl border border-white/40  flex items-center gap-3 hidden sm:flex"
             >
               <div className="bg-amber-50  p-2 rounded-xl text-amber-500">
@@ -237,7 +237,7 @@ const Hero = () => {
             {/* Floating Card 2: Bottom Right (Online status) */}
             <motion.div
               animate={{ y: [0, 12, 0] }}
-              transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
+              transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut", delay: 0.2 }}
               className="absolute -bottom-6 -right-6 bg-white/90  backdrop-blur-md p-4 rounded-2xl shadow-xl border border-white/40  flex items-center gap-3"
             >
               <div className="relative flex h-3 w-3">
@@ -253,7 +253,7 @@ const Hero = () => {
             {/* Floating Card 3: Bottom Left (AI assistance status) */}
             <motion.div
               animate={{ x: [0, 10, 0] }}
-              transition={{ duration: 6, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+              transition={{ duration: 3, repeat: Infinity, ease: "easeInOut", delay: 0.4 }}
               className="absolute bottom-12 -left-8 bg-white/90  backdrop-blur-md p-3.5 rounded-2xl shadow-xl border border-white/40  flex items-center gap-2.5 hidden md:flex"
             >
               <div className="bg-blue-50  p-2 rounded-xl text-blue-500 ">
