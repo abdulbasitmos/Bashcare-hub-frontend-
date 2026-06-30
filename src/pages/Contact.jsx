@@ -98,7 +98,7 @@ const Contact = () => {
           {/* Contact Info */}
           <div className="flex flex-col justify-center">
             <h2 className="text-3xl font-bold text-[var(--text-primary)] mb-8">{t('Contact Information')}</h2>
-            <p className="text-lg text-gray-600 mb-12">
+            <p className="text-lg text-[var(--text-secondary)] mb-12">
               {t('Have questions about our platform or services? Reach out to us through any of the following channels. Our team is always ready to help.')}
             </p>
 
@@ -109,7 +109,7 @@ const Contact = () => {
                 </div>
                 <div>
                   <h4 className="text-xl font-bold text-[var(--text-primary)] mb-1">{t('Our Office')}</h4>
-                  <p className="text-gray-600">123 Medical Drive, Health City, ST 12345</p>
+                  <p className="text-[var(--text-secondary)]">123 Medical Drive, Health City, ST 12345</p>
                 </div>
               </div>
 
@@ -119,7 +119,7 @@ const Contact = () => {
                 </div>
                 <div>
                   <h4 className="text-xl font-bold text-[var(--text-primary)] mb-1">{t('Phone Number')}</h4>
-                  <p className="text-gray-600">+1 (555) 000-0000</p>
+                  <p className="text-[var(--text-secondary)]">+1 (555) 000-0000</p>
                 </div>
               </div>
 
@@ -129,7 +129,7 @@ const Contact = () => {
                 </div>
                 <div>
                   <h4 className="text-xl font-bold text-[var(--text-primary)] mb-1">{t('Email Address')}</h4>
-                  <p className="text-gray-600">contact@bashcarehub.com</p>
+                  <p className="text-[var(--text-secondary)]">contact@bashcarehub.com</p>
                 </div>
               </div>
 
@@ -139,8 +139,8 @@ const Contact = () => {
                 </div>
                 <div>
                   <h4 className="text-xl font-bold text-[var(--text-primary)] mb-1">{t('Working Hours')}</h4>
-                  <p className="text-gray-600">Mon - Fri: 9:00 AM - 6:00 PM</p>
-                  <p className="text-gray-600">Sat - Sun: 10:00 AM - 4:00 PM</p>
+                  <p className="text-[var(--text-secondary)]">Mon - Fri: 9:00 AM - 6:00 PM</p>
+                  <p className="text-[var(--text-secondary)]">Sat - Sun: 10:00 AM - 4:00 PM</p>
                 </div>
               </div>
             </div>
@@ -160,10 +160,10 @@ const Contact = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: 0.1 + index * 0.1 }}
-                className="rounded-3xl bg-white p-8 border border-slate-200 shadow-sm"
+                className="rounded-3xl bg-[var(--bg-secondary)] p-8 border border-[var(--border-primary)] shadow-sm"
               >
                 <h3 className="text-xl font-bold text-[var(--text-primary)] mb-3">{item.title}</h3>
-                <p className="text-gray-600 leading-relaxed">{item.text}</p>
+                <p className="text-[var(--text-secondary)] leading-relaxed">{item.text}</p>
               </motion.div>
             ))}
           </div>

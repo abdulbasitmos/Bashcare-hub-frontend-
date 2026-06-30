@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, Link } from 'react-router-dom';
 import Sidebar from '../../components/dashboard/Sidebar';
 import TopNav from '../../components/dashboard/TopNav';
 import { 
@@ -169,12 +169,14 @@ const MediaCallModal = ({ type, isOpen, onClose, doctorName, onCallCompleted }) 
               >
                 {isMuted ? <MicOff size={24} /> : <Mic size={24} />}
               </button>
-              <button 
-                onClick={() => setIsCameraOff(!isCameraOff)}
-                className={`p-4 rounded-2xl transition-all ${isCameraOff ? 'bg-red-600 text-white' : 'bg-[var(--bg-secondary)]/10 hover:bg-[var(--bg-secondary)]/20 text-white'}`}
-              >
-                {isCameraOff ? <VideoOff size={24} /> : <Video size={24} />}
-              </button>
+              {type === 'video' && (
+                <button 
+                  onClick={() => setIsCameraOff(!isCameraOff)}
+                  className={`p-4 rounded-2xl transition-all ${isCameraOff ? 'bg-red-600 text-white' : 'bg-[var(--bg-secondary)]/10 hover:bg-[var(--bg-secondary)]/20 text-white'}`}
+                >
+                  {isCameraOff ? <VideoOff size={24} /> : <Video size={24} />}
+                </button>
+              )}
               <button onClick={handleHangUp} className="p-4 bg-red-600 hover:bg-red-700 rounded-2xl text-white transition-all shadow-lg shadow-red-600/20">
                 <Phone size={24} className="rotate-[135deg]" />
               </button>
@@ -215,10 +217,37 @@ const VerificationHub = ({
   scrollRef
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
-  const filteredDoctors = pendingDoctors.filter(d => 
-    d.name?.toLowerCase().includes(searchTerm.toLowerCase()) || 
-    d.specialty?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const [checklist, setChecklist] = useState({
+    license: false,
+    identity: false,
+    education: false,
+    background: false,
+    interview: false
+  });
+
+  useEffect(() => {
+    setChecklist({
+      license: false,
+      identity: false,
+      education: false,
+      background: false,
+      interview: false
+    });
+  }, [selectedDoctor?.id]);
+
+  const toggleChecklistItem = (key) => {
+    setChecklist(prev => ({ ...prev, [key]: !prev[key] }));
+  };
+
+  const checklistProgress = Object.values(checklist).filter(Boolean).length;
+  const checklistTotal = Object.keys(checklist).length;
+  const checklistPercentage = Math.round((checklistProgress / checklistTotal) * 100);
+
+  const filteredDoctors = pendingDoctors.filter(d => {
+    if (!searchTerm.trim()) return true;
+    return d.name?.toLowerCase()?.includes(searchTerm.toLowerCase()) || 
+           d.specialty?.toLowerCase()?.includes(searchTerm.toLowerCase());
+  });
 
   return (
   <div className="flex-grow flex gap-8 min-h-0 overflow-hidden">
@@ -439,27 +468,76 @@ const VerificationHub = ({
                 )}
               </div>
 
-              <div className="w-64 p-6 bg-[var(--bg-secondary)]  overflow-y-auto custom-scrollbar hidden xl:block transition-colors">
-                <h4 className="text-xs font-bold text-slate-500 (--text-secondary)] uppercase tracking-widest mb-6 text-center">Submitted Files</h4>
-                <div className="space-y-4">
-                  {selectedDoctor.verificationDocuments?.length > 0 ? selectedDoctor.verificationDocuments.map((file, i) => (
-                    <div 
-                      key={i} 
-                      onClick={() => window.open(file.url, '_blank')}
-                      className="group p-3 border border-[var(--border-primary)]  rounded-xl hover:border-[var(--border-primary)] dark:border-blue-600 transition-all cursor-pointer bg-white "
-                    >
-                      <p className="text-xs font-bold text-slate-900  truncate">{file.name}</p>
-                      <div className="flex items-center justify-between mt-1">
-                        <p className="text-[10px] text-slate-500 font-medium">{file.size}</p>
-                        <ExternalLink size={12} className="text-gray-300  group-hover:text-blue-500" />
+              <div className="w-64 p-6 bg-[var(--bg-secondary)]  overflow-y-auto custom-scrollbar hidden xl:block transition-colors border-l border-[var(--border-primary)] flex flex-col gap-6">
+                <div>
+                  <h4 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4 text-center">Submitted Files</h4>
+                  <div className="space-y-3">
+                    {selectedDoctor.verificationDocuments?.length > 0 ? selectedDoctor.verificationDocuments.map((file, i) => (
+                      <div 
+                        key={i} 
+                        onClick={() => window.open(file.url, '_blank')}
+                        className="group p-3 border border-[var(--border-primary)]  rounded-xl hover:border-blue-500 transition-all cursor-pointer bg-white "
+                      >
+                        <p className="text-xs font-bold text-slate-900  truncate">{file.name}</p>
+                        <div className="flex items-center justify-between mt-1">
+                          <p className="text-[10px] text-slate-500 font-medium">{file.size}</p>
+                          <ExternalLink size={12} className="text-gray-300  group-hover:text-blue-500" />
+                        </div>
                       </div>
-                    </div>
-                  )) : (
-                    <div className="text-center py-10 opacity-40">
-                      <FileText size={32} className="mx-auto mb-2" />
-                      <p className="text-[10px] font-bold">No documents uploaded</p>
-                    </div>
-                  )}
+                    )) : (
+                      <div className="text-center py-6 opacity-40">
+                        <FileText size={28} className="mx-auto mb-2" />
+                        <p className="text-[10px] font-bold">No documents uploaded</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <hr className="border-[var(--border-primary)] opacity-30" />
+
+                {/* Verification Checklist Component */}
+                <div className="flex flex-col min-h-0">
+                  <div className="flex items-center justify-between mb-3">
+                    <h4 className="text-xs font-bold text-slate-500 uppercase tracking-widest">Protocol Checklist</h4>
+                    <span className="text-[10px] font-black text-blue-600 bg-blue-50 dark:bg-blue-950 px-2 py-0.5 rounded-full">{checklistPercentage}%</span>
+                  </div>
+                  
+                  {/* Progress bar */}
+                  <div className="w-full h-1.5 bg-gray-100 dark:bg-slate-800 rounded-full mb-4 overflow-hidden">
+                    <div 
+                      className="h-full bg-blue-600 transition-all duration-300"
+                      style={{ width: `${checklistPercentage}%` }}
+                    ></div>
+                  </div>
+
+                  <div className="space-y-2.5">
+                    {[
+                      { key: 'license', label: 'Verify Medical License' },
+                      { key: 'identity', label: 'Verify Government ID' },
+                      { key: 'education', label: 'Verify Degree Certs' },
+                      { key: 'background', label: 'Check Board Registry' },
+                      { key: 'interview', label: 'Live Interview Call' }
+                    ].map((item) => (
+                      <div 
+                        key={item.key}
+                        onClick={() => toggleChecklistItem(item.key)}
+                        className={`flex items-center gap-2.5 p-2.5 rounded-xl border transition-all cursor-pointer select-none bg-white dark:bg-slate-900 ${
+                          checklist[item.key] 
+                            ? 'border-green-500 bg-green-50/10 dark:bg-green-950/20' 
+                            : 'border-[var(--border-primary)] hover:border-blue-200'
+                        }`}
+                      >
+                        <div className={`w-3.5 h-3.5 rounded-md border flex items-center justify-center transition-colors ${
+                          checklist[item.key] ? 'border-green-600 bg-green-600 text-white' : 'border-gray-300 dark:border-slate-700'
+                        }`}>
+                          {checklist[item.key] && <CheckCircle2 size={8} strokeWidth={3} />}
+                        </div>
+                        <span className={`text-[10px] font-bold ${checklist[item.key] ? 'text-green-700 line-through opacity-70' : 'text-slate-700 dark:text-slate-350'}`}>
+                          {item.label}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
@@ -479,10 +557,11 @@ const VerificationHub = ({
 
 const VerifiedDirectory = ({ doctors }) => {
   const [searchTerm, setSearchTerm] = useState('');
-  const filteredDoctors = doctors.filter(d => 
-    d.name?.toLowerCase().includes(searchTerm.toLowerCase()) || 
-    d.specialty?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredDoctors = doctors.filter(d => {
+    if (!searchTerm.trim()) return true;
+    return d.name?.toLowerCase()?.includes(searchTerm.toLowerCase()) || 
+           d.specialty?.toLowerCase()?.includes(searchTerm.toLowerCase());
+  });
 
   return (
   <section className="bg-[var(--bg-secondary)]  rounded-[24px] shadow-sm hover:shadow-md transition-shadow fade-in hover:shadow-md transition-all duration-300 border border-[var(--border-primary)]  overflow-hidden transition-colors">
@@ -528,7 +607,7 @@ const VerifiedDirectory = ({ doctors }) => {
                 <span className="px-2 py-1 bg-green-50  text-green-600  rounded-lg text-[10px] font-bold uppercase tracking-widest">Verified</span>
               </td>
               <td className="px-8 py-5 text-right">
-                <button className="p-2 text-slate-500 hover:text-[var(--color-primary)] dark:text-blue-400 transition-all"><ChevronRight size={20} /></button>
+                <Link to={`/doctor/${doc.id}`} className="p-2 text-slate-500 hover:text-[var(--color-primary)] dark:text-blue-400 transition-all inline-block"><ChevronRight size={20} /></Link>
               </td>
             </tr>
           ))}
@@ -722,27 +801,38 @@ const OfficerDashboard = ({ user, logout }) => {
         db.getDoctors(),
         db.getChats()
       ]);
-      setPendingDoctors(allDoctors.filter(d => d.status === 'pending' || d.status === 'rejected'));
-      setVerifiedDoctors(allDoctors.filter(d => d.status === 'verified' || d.status === 'active'));
+      
+      if (Array.isArray(allDoctors)) {
+        setPendingDoctors(allDoctors.filter(d => {
+          const status = d.status?.toLowerCase();
+          return status === 'pending' || status === 'rejected';
+        }));
+        setVerifiedDoctors(allDoctors.filter(d => {
+          const status = d.status?.toLowerCase();
+          return status === 'verified' || status === 'active';
+        }));
+      }
       
       const formattedChats = {};
-      allChats.forEach(chat => {
-        const doctor = allDoctors.find(d => 
-          chat.participants.some(p => {
-            const pId = typeof p === 'object' && p !== null ? (p._id || p.id) : p;
-            return pId === d.userId || pId === d.id;
-          })
-        );
-        if (doctor) {
-          formattedChats[doctor.id] = chat.messages;
-          if (doctor.userId) {
-            formattedChats[doctor.userId] = chat.messages;
+      if (Array.isArray(allChats) && Array.isArray(allDoctors)) {
+        allChats.forEach(chat => {
+          const doctor = allDoctors.find(d => 
+            chat.participants.some(p => {
+              const pId = typeof p === 'object' && p !== null ? (p._id || p.id) : p;
+              return pId === d.userId || pId === d.id;
+            })
+          );
+          if (doctor) {
+            formattedChats[doctor.id] = chat.messages;
+            if (doctor.userId) {
+              formattedChats[doctor.userId] = chat.messages;
+            }
           }
-        }
-      });
+        });
+      }
       setChats(formattedChats);
       
-      if (selectedDoctor) {
+      if (selectedDoctor && Array.isArray(allDoctors)) {
         const updatedDoc = allDoctors.find(d => d.id === selectedDoctor.id);
         if (updatedDoc) setSelectedDoctor(updatedDoc);
       }
@@ -750,6 +840,7 @@ const OfficerDashboard = ({ user, logout }) => {
       setLoading(false);
     } catch (error) {
       console.error("Error fetching data:", error);
+      setLoading(false);
     }
   }, [selectedDoctor]);
 
@@ -892,7 +983,8 @@ const OfficerDashboard = ({ user, logout }) => {
   const handleVerify = async (id) => {
     try {
       await db.updateDoctor(id, { status: 'verified' });
-      await db.addNotification({ userId: id, title: 'Account Verified', message: 'Congratulations! Your medical account has been verified. Please set up your profile to continue.', type: 'system' });
+      const targetUserId = selectedDoctor?.userId || id;
+      await db.addNotification({ userId: targetUserId, title: 'Account Verified', message: 'Congratulations! Your medical account has been verified. Please set up your profile to continue.', type: 'system' });
       setSelectedDoctor(null);
       await fetchData();
       alert('Doctor has been verified successfully!');
@@ -905,7 +997,8 @@ const OfficerDashboard = ({ user, logout }) => {
     if (window.confirm('Are you sure you want to reject this application?')) {
       try {
         await db.updateDoctor(id, { status: 'rejected' });
-        await db.addNotification({ userId: id, title: 'Application Rejected', message: 'Your verification request was rejected.', type: 'system' });
+        const targetUserId = selectedDoctor?.userId || id;
+        await db.addNotification({ userId: targetUserId, title: 'Application Rejected', message: 'Your verification request was rejected.', type: 'system' });
         setSelectedDoctor(null);
         await fetchData();
       } catch (error) {
@@ -935,77 +1028,80 @@ const OfficerDashboard = ({ user, logout }) => {
         <TopNav userName={user?.name || "Officer"} role="officer" />
         
         <main className="p-4 sm:p-6 lg:p-8 flex-grow flex flex-col gap-8 overflow-hidden custom-scrollbar overflow-y-auto">
-          
-          {/* Welcome Banner Card */}
-          <div className="bg-gradient-to-r from-[#2563EB] to-[#4F46E5] rounded-[32px] p-8 text-white relative overflow-hidden shadow-lg shadow-blue-500/10 flex-shrink-0">
-            <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-2xl pointer-events-none"></div>
-            <div className="absolute bottom-0 left-1/3 w-32 h-32 bg-white/5 rounded-full blur-xl pointer-events-none"></div>
-
-            <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
-              <div className="space-y-4">
-                <div className="inline-flex items-center gap-2 bg-white/15 backdrop-blur-md px-4 py-1.5 rounded-full text-xs font-bold tracking-wide">
-                  <Calendar size={13} />
-                  <span>{currentDateString} • {currentTimeString}</span>
-                </div>
-                <div>
-                  <h1 className="text-3xl font-black tracking-tight">Verification Command Center</h1>
-                  <p className="text-white/80 text-sm mt-1">We hope you are having a nice {currentDayName}. Review credentials and interview medical applicants.</p>
-                </div>
-              </div>
-
-              <div className="hidden md:block flex-shrink-0 pr-4">
-                <svg className="w-24 h-24 text-white opacity-85" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M50 15C50 15 32 30 32 52C32 63.0457 40.0543 72.1 50 72.1C59.9457 72.1 68 63.0457 68 52C68 30 50 15 50 15Z" fill="currentColor" fillOpacity="0.1" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
-                  <path d="M50 40V64" stroke="currentColor" strokeWidth="3" strokeLinecap="round"/>
-                  <path d="M38 52H62" stroke="currentColor" strokeWidth="3" strokeLinecap="round"/>
-                  <circle cx="50" cy="52" r="28" stroke="currentColor" strokeWidth="2" strokeDasharray="3 3"/>
-                </svg>
-              </div>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 flex-shrink-0">
-            {stats.map((stat, i) => (
-              <div key={i} className="bg-white dark:bg-slate-900 p-6 rounded-[24px] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-gray-100 dark:border-slate-800/40 flex items-center gap-4 transition-all hover:shadow-md">
-                <div className={`p-4 rounded-2xl ${stat.bg} `}>{stat.icon}</div>
-                <div>
-                  <p className="text-2xl font-black text-slate-900 dark:text-slate-100">{stat.value}</p>
-                  <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">{stat.label}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-
           <Routes>
             <Route index element={
-              <VerificationHub 
-                user={user} 
-                pendingDoctors={pendingDoctors} 
-                chats={chats} 
-                onVerify={handleVerify} 
-                onReject={handleReject} 
-                selectedDoctor={selectedDoctor} 
-                onSelectDoctor={setSelectedDoctor} 
-                inputText={inputText} 
-                setInputText={setInputText} 
-                onSendMessage={handleSendMessage}
-                onSendSpecialMessage={handleSendSpecialMessage}
-                onDirectSendSpecial={handleDirectSendSpecial}
-                callModal={callModal}
-                setCallModal={setCallModal}
-                // Voice note hooks
-                isRecording={isRecording}
-                recordingTime={recordingTime}
-                startRecording={startRecording}
-                stopRecording={stopRecording}
-                cancelRecording={cancelRecording}
-                // Refs
-                fileInputRef={fileInputRef}
-                imageInputRef={imageInputRef}
-                scrollRef={scrollRef}
-              />
+              <div className="flex flex-col gap-8 flex-grow min-h-0 overflow-hidden">
+                {/* Welcome Banner Card */}
+                <div className="bg-gradient-to-r from-[#2563EB] to-[#4F46E5] rounded-[32px] p-8 text-white relative overflow-hidden shadow-lg shadow-blue-500/10 flex-shrink-0">
+                  <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-2xl pointer-events-none"></div>
+                  <div className="absolute bottom-0 left-1/3 w-32 h-32 bg-white/5 rounded-full blur-xl pointer-events-none"></div>
+
+                  <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+                    <div className="space-y-4">
+                      <div className="inline-flex items-center gap-2 bg-white/15 backdrop-blur-md px-4 py-1.5 rounded-full text-xs font-bold tracking-wide">
+                        <Calendar size={13} />
+                        <span>{currentDateString} • {currentTimeString}</span>
+                      </div>
+                      <div>
+                        <h1 className="text-3xl font-black tracking-tight">Verification Command Center</h1>
+                        <p className="text-white/80 text-sm mt-1">We hope you are having a nice {currentDayName}. Review credentials and interview medical applicants.</p>
+                      </div>
+                    </div>
+
+                    <div className="hidden md:block flex-shrink-0 pr-4">
+                      <svg className="w-24 h-24 text-white opacity-85" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M50 15C50 15 32 30 32 52C32 63.0457 40.0543 72.1 50 72.1C59.9457 72.1 68 63.0457 68 52C68 30 50 15 50 15Z" fill="currentColor" fillOpacity="0.1" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+                        <path d="M50 40V64" stroke="currentColor" strokeWidth="3" strokeLinecap="round"/>
+                        <path d="M38 52H62" stroke="currentColor" strokeWidth="3" strokeLinecap="round"/>
+                        <circle cx="50" cy="52" r="28" stroke="currentColor" strokeWidth="2" strokeDasharray="3 3"/>
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Stats Grid */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 flex-shrink-0">
+                  {stats.map((stat, i) => (
+                    <div key={i} className="bg-white dark:bg-slate-900 p-6 rounded-[24px] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-gray-100 dark:border-slate-800/40 flex items-center gap-4 transition-all hover:shadow-md">
+                      <div className={`p-4 rounded-2xl ${stat.bg} `}>{stat.icon}</div>
+                      <div>
+                        <p className="text-2xl font-black text-slate-900 dark:text-slate-100">{stat.value}</p>
+                        <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">{stat.label}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <VerificationHub 
+                  user={user} 
+                  pendingDoctors={pendingDoctors} 
+                  chats={chats} 
+                  onVerify={handleVerify} 
+                  onReject={handleReject} 
+                  selectedDoctor={selectedDoctor} 
+                  onSelectDoctor={setSelectedDoctor} 
+                  inputText={inputText} 
+                  setInputText={setInputText} 
+                  onSendMessage={handleSendMessage}
+                  onSendSpecialMessage={handleSendSpecialMessage}
+                  onDirectSendSpecial={handleDirectSendSpecial}
+                  callModal={callModal}
+                  setCallModal={setCallModal}
+                  // Voice note hooks
+                  isRecording={isRecording}
+                  recordingTime={recordingTime}
+                  startRecording={startRecording}
+                  stopRecording={stopRecording}
+                  cancelRecording={cancelRecording}
+                  // Refs
+                  fileInputRef={fileInputRef}
+                  imageInputRef={imageInputRef}
+                  scrollRef={scrollRef}
+                />
+              </div>
             } />
             <Route path="pending" element={<Navigate to="/dashboard/officer" replace />} />
+            <Route path="messages" element={<Navigate to="/dashboard/officer" replace />} />
             <Route path="directory" element={<VerifiedDirectory doctors={verifiedDoctors} />} />
             <Route path="audits" element={<AuditReports />} />
             <Route path="settings" element={<OfficerSettings user={user} />} />

@@ -30,7 +30,7 @@ const BackgroundPanel = ({ images = [], image, children, className = '' }) => {
           />
         )}
       </AnimatePresence>
-      <div className="absolute inset-0 bg-slate-950/60 backdrop-blur-sm" />
+      <div className="absolute inset-0 bg-white/75 dark:bg-slate-950/65 backdrop-blur-sm" />
       <div className="relative z-10">{children}</div>
     </section>
   );

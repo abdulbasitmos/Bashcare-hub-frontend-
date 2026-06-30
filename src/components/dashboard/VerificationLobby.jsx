@@ -172,7 +172,15 @@ const VerificationLobby = ({ user, logout }) => {
     try {
       // Fetch messages
       const allChats = await db.getChats();
-      const myChat = allChats.find(chat => chat.participants.includes(user.id));
+      let myChat = null;
+      if (Array.isArray(allChats)) {
+        myChat = allChats.find(chat => 
+          chat.participants.some(p => {
+            const pId = typeof p === 'object' && p !== null ? (p._id || p.id) : p;
+            return pId === user.id;
+          })
+        );
+      }
       
       if (myChat) {
         setMessages(myChat.messages);

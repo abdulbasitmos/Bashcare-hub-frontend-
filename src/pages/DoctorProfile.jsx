@@ -60,7 +60,7 @@ const DoctorProfile = () => {
   );
 
   return (
-    <div className="relative min-h-screen bg-slate-50 overflow-hidden">
+    <div className="relative min-h-screen bg-[var(--bg-primary)] overflow-hidden">
       <BackgroundPanel
         images={[
           'https://images.unsplash.com/photo-1493809842364-78817add7ffb?auto=format&fit=crop&q=80&w=1600',
@@ -145,7 +145,7 @@ const DoctorProfile = () => {
                 </div>
                 Professional Biography
               </h2>
-              <p className="text-gray-600 leading-relaxed text-lg font-medium">
+              <p className="text-[var(--text-secondary)] leading-relaxed text-lg font-medium">
                 {doctor.bio || doctor.about || `Dr. ${doctor.name} is a highly skilled ${doctor.specialty} with years of experience in providing exceptional medical care. Specializing in ${doctor.specialty}, they have dedicated their career to improving patient outcomes through evidence-based medicine and a compassionate approach.`}
               </p>
             </section>

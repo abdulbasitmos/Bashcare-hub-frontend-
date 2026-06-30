@@ -47,10 +47,10 @@ const About = () => {
           <div className="lg:grid lg:grid-cols-2 gap-16 items-center">
             <div>
               <h2 className="text-3xl font-bold text-[var(--text-primary)] mb-6">{t('Our Mission')}</h2>
-              <p className="text-lg text-gray-600 mb-8 leading-relaxed">
+              <p className="text-lg text-[var(--text-secondary)] mb-8 leading-relaxed">
                 {t('Bashcare Hub was founded with a single goal: to make high-quality healthcare accessible, efficient, and compassionate. We bridge the gap between patients and providers through advanced technology and a dedicated network of medical professionals.')}
               </p>
-              <p className="text-lg text-gray-600 leading-relaxed">
+              <p className="text-lg text-[var(--text-secondary)] leading-relaxed">
                 {t('Our platform integrates everything from appointment booking and record management to doctor verification and hospital administration, ensuring a seamless experience for everyone in the healthcare ecosystem.')}
               </p>
             </div>
@@ -73,14 +73,14 @@ const About = () => {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-16">
               <h2 className="text-3xl font-bold text-[var(--text-primary)]">{t('Our Core Values')}</h2>
-              <p className="mt-4 text-xl text-gray-600">{t('The principles that guide our every action.')}</p>
+              <p className="mt-4 text-xl text-[var(--text-secondary)]">{t('The principles that guide our every action.')}</p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
               {values.map((value, index) => (
                 <div key={index} className="bg-[var(--bg-secondary)] p-8 rounded-2xl shadow-lg border border-[var(--border-primary)] hover:shadow-xl transition-shadow">
                   <div className="mb-6">{value.icon}</div>
                   <h3 className="text-xl font-bold text-[var(--text-primary)] mb-4">{value.title}</h3>
-                  <p className="text-gray-600">{value.description}</p>
+                  <p className="text-[var(--text-secondary)]">{value.description}</p>
                 </div>
               ))}
             </div>
