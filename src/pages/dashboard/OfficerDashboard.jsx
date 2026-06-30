@@ -209,10 +209,18 @@ const VerificationHub = ({
   startRecording,
   stopRecording,
   cancelRecording,
-  // Files Refs
+  // Refs
   fileInputRef,
-  imageInputRef
-}) => (
+  imageInputRef,
+  scrollRef
+}) => {
+  const [searchTerm, setSearchTerm] = useState('');
+  const filteredDoctors = pendingDoctors.filter(d => 
+    d.name?.toLowerCase().includes(searchTerm.toLowerCase()) || 
+    d.specialty?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  return (
   <div className="flex-grow flex gap-8 min-h-0 overflow-hidden">
     <MediaCallModal 
       isOpen={callModal.isOpen} 
@@ -230,18 +238,20 @@ const VerificationHub = ({
           <input 
             type="text" 
             placeholder="Search doctors..." 
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full bg-[#f8fafc]  border-none rounded-xl py-2 pl-10 pr-4 text-sm focus:ring-2 focus:ring-blue-500/20 text-slate-900 "
           />
         </div>
       </div>
       <div className="flex-grow overflow-y-auto custom-scrollbar">
-        {pendingDoctors.length === 0 ? (
+        {filteredDoctors.length === 0 ? (
           <div className="p-8 text-center">
             <CheckCircle2 size={48} className="mx-auto text-green-200  mb-4" />
             <p className="text-sm font-bold text-slate-500 (--text-secondary)]">All caught up!</p>
           </div>
         ) : (
-          pendingDoctors.map((doc) => (
+          filteredDoctors.map((doc) => (
             <button
               key={doc.id}
               onClick={() => onSelectDoctor(doc)}
@@ -308,7 +318,7 @@ const VerificationHub = ({
 
             <div className="flex-grow flex bg-white  min-h-0 overflow-hidden">
               <div className="flex-grow flex flex-col border-r border-[var(--border-primary)]  min-w-0">
-                <div className="flex-grow overflow-y-auto p-6 space-y-4 custom-scrollbar">
+                <div ref={scrollRef} className="flex-grow overflow-y-auto p-6 space-y-4 custom-scrollbar">
                   {(chats[selectedDoctor.userId] || chats[selectedDoctor.id])?.map((msg, i) => (
                     <div key={i} className={`flex ${msg.sender === 'officer' ? 'justify-end' : 'justify-start'}`}>
                       <div className={`max-w-[80%] space-y-1 ${msg.sender === 'officer' ? 'items-end' : 'items-start'}`}>
@@ -464,9 +474,17 @@ const VerificationHub = ({
       </AnimatePresence>
     </div>
   </div>
-);
+  );
+};
 
-const VerifiedDirectory = ({ doctors }) => (
+const VerifiedDirectory = ({ doctors }) => {
+  const [searchTerm, setSearchTerm] = useState('');
+  const filteredDoctors = doctors.filter(d => 
+    d.name?.toLowerCase().includes(searchTerm.toLowerCase()) || 
+    d.specialty?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  return (
   <section className="bg-[var(--bg-secondary)]  rounded-[24px] shadow-sm hover:shadow-md transition-shadow fade-in hover:shadow-md transition-all duration-300 border border-[var(--border-primary)]  overflow-hidden transition-colors">
     <div className="p-8 border-b border-gray-50  flex items-center justify-between">
       <h2 className="text-xl font-bold text-slate-900 ">Verified Medical Professionals</h2>
@@ -475,6 +493,8 @@ const VerifiedDirectory = ({ doctors }) => (
         <input 
           type="text" 
           placeholder="Search directory..." 
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
           className="pl-10 pr-4 py-2 bg-white  border-none rounded-xl text-xs focus:ring-2 focus:ring-blue-500/20 w-64 text-slate-900 "
         />
       </div>
@@ -490,7 +510,7 @@ const VerifiedDirectory = ({ doctors }) => (
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-50 ">
-          {doctors.map((doc, i) => (
+          {filteredDoctors.map((doc, i) => (
             <tr key={i} className="hover:bg-white dark:bg-slate-900/50 transition-colors">
               <td className="px-8 py-5">
                 <div className="flex items-center gap-3">
@@ -516,7 +536,8 @@ const VerifiedDirectory = ({ doctors }) => (
       </table>
     </div>
   </section>
-);
+  );
+};
 
 const AuditReports = () => {
   const [logs, setLogs] = useState([]);
@@ -538,11 +559,24 @@ const AuditReports = () => {
 
   if (loading) return <div className="p-8 text-center font-bold text-slate-500 (--text-secondary)]">Loading audit reports...</div>;
 
+  const handleExport = () => {
+    const csvContent = "data:text/csv;charset=utf-8," 
+      + "ID,Action,Target,Officer,Date,Status\n"
+      + logs.map(e => `${e.id},${e.action},${e.target},${e.officer},${e.date},${e.status}`).join("\n");
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "audit_logs.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
     <section className="bg-[var(--bg-secondary)]  rounded-[24px] shadow-sm hover:shadow-md transition-shadow fade-in hover:shadow-md transition-all duration-300 border border-[var(--border-primary)]  overflow-hidden transition-colors">
       <div className="p-8 border-b border-gray-50  flex items-center justify-between">
         <h2 className="text-xl font-bold text-slate-900 ">Verification Audit Logs</h2>
-        <button className="text-xs font-bold text-[var(--color-primary)]  bg-[#f8fafc]  px-4 py-2 rounded-xl hover:bg-blue-100 dark:bg-blue-900/40 transition-all">Export Logs</button>
+        <button onClick={handleExport} className="text-xs font-bold text-[var(--color-primary)]  bg-[#f8fafc]  px-4 py-2 rounded-xl hover:bg-blue-100 dark:bg-blue-900/40 transition-all">Export Logs</button>
       </div>
       <div className="overflow-x-auto">
         <table className="w-full text-left">
@@ -968,6 +1002,7 @@ const OfficerDashboard = ({ user, logout }) => {
                 // Refs
                 fileInputRef={fileInputRef}
                 imageInputRef={imageInputRef}
+                scrollRef={scrollRef}
               />
             } />
             <Route path="pending" element={<Navigate to="/dashboard/officer" replace />} />

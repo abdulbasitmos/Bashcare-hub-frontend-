@@ -16,6 +16,55 @@ import {
 import { useLocation } from 'react-router-dom';
 import { db } from '../../../utils/db';
 
+const formatTime = (secs) => {
+  const m = Math.floor(secs / 60);
+  const s = secs % 60;
+  return `${m}:${s < 10 ? '0' : ''}${s}`;
+};
+
+// MediaCallModal component for handling voice/video calls UI
+const MediaCallModal = ({ isOpen, type, onClose, onEndCall }) => {
+  const [duration, setDuration] = useState(0);
+  const timerRef = useRef(null);
+
+  useEffect(() => {
+    if (isOpen) {
+      setDuration(0);
+      timerRef.current = setInterval(() => setDuration(d => d + 1), 1000);
+    } else {
+      clearInterval(timerRef.current);
+    }
+    return () => clearInterval(timerRef.current);
+  }, [isOpen]);
+
+  if (!isOpen) return null;
+
+  const handleEnd = async () => {
+    clearInterval(timerRef.current);
+    const durationStr = formatTime(duration);
+    await onEndCall(durationStr);
+    onClose();
+  };
+
+  const handleCancel = () => {
+    clearInterval(timerRef.current);
+    onClose();
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
+      <div className="bg-white p-6 rounded-xl shadow-lg w-96">
+        <h2 className="text-xl font-semibold mb-4">{type === 'video' ? 'Video Call' : 'Voice Call'} with Verification Officer</h2>
+        <p className="mb-2">Duration: {formatTime(duration)}</p>
+        <div className="flex justify-end gap-4 mt-4">
+          <button onClick={handleCancel} className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300">Cancel</button>
+          <button onClick={handleEnd} className="px-4 py-2 bg-[#2563EB] text-white rounded hover:bg-blue-700">End Call</button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const Messages = ({ user }) => {
   // Utility functions for formatting time and file sizes
   const formatTime = (secs) => {
@@ -40,49 +89,6 @@ const Messages = ({ user }) => {
     const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
-  };
-
-  // MediaCallModal component for handling voice/video calls UI
-  const MediaCallModal = ({ isOpen, type, onClose, onEndCall }) => {
-    const [duration, setDuration] = useState(0);
-    const timerRef = useRef(null);
-
-    useEffect(() => {
-      if (isOpen) {
-        setDuration(0);
-        timerRef.current = setInterval(() => setDuration(d => d + 1), 1000);
-      } else {
-        clearInterval(timerRef.current);
-      }
-      return () => clearInterval(timerRef.current);
-    }, [isOpen]);
-
-    if (!isOpen) return null;
-
-    const handleEnd = async () => {
-      clearInterval(timerRef.current);
-      const durationStr = formatTime(duration);
-      await onEndCall(durationStr);
-      onClose();
-    };
-
-    const handleCancel = () => {
-      clearInterval(timerRef.current);
-      onClose();
-    };
-
-    return (
-      <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
-        <div className="bg-white p-6 rounded-xl shadow-lg w-96">
-          <h2 className="text-xl font-semibold mb-4">{type === 'video' ? 'Video Call' : 'Voice Call'} with Verification Officer</h2>
-          <p className="mb-2">Duration: {formatTime(duration)}</p>
-          <div className="flex justify-end gap-4 mt-4">
-            <button onClick={handleCancel} className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300">Cancel</button>
-            <button onClick={handleEnd} className="px-4 py-2 bg-[#2563EB] text-white rounded hover:bg-blue-700">End Call</button>
-          </div>
-        </div>
-      </div>
-    );
   };
 
   const location = useLocation();
