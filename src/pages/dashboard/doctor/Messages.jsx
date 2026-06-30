@@ -221,11 +221,19 @@ const Messages = ({ user }) => {
 
   useEffect(() => {
     loadChats();
+    const interval = setInterval(() => {
+      loadChats();
+    }, 5000);
+    return () => clearInterval(interval);
   }, [loadChats]);
 
   useEffect(() => {
     if (activeChatId) {
       loadMessages(activeChatId);
+      const interval = setInterval(() => {
+        loadMessages(activeChatId);
+      }, 5000);
+      return () => clearInterval(interval);
     }
   }, [activeChatId, loadMessages]);
 
@@ -549,6 +557,14 @@ const Messages = ({ user }) => {
           </div>
         )}
       </div>
+      <MediaCallModal 
+        isOpen={callModal.isOpen} 
+        type={callModal.type} 
+        onClose={() => setCallModal({ ...callModal, isOpen: false })} 
+        onEndCall={(duration) => {
+           handleDirectSendSpecial(callModal.type, '', 'Call.log', 0, duration);
+        }}
+      />
     </div>
   );
 };

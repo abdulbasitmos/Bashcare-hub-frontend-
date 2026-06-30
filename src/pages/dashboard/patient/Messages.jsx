@@ -177,18 +177,20 @@ const Messages = ({ user }) => {
   }, [preSelectedDoctor, user?.id, user?._id]);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
+    loadChats();
+    const interval = setInterval(() => {
       loadChats();
-    }, 0);
-    return () => clearTimeout(timer);
+    }, 5000);
+    return () => clearInterval(interval);
   }, [loadChats]);
 
   useEffect(() => {
     if (activeChatId && activeChatId !== 'support') {
-      const timer = setTimeout(() => {
+      loadMessages(activeChatId);
+      const interval = setInterval(() => {
         loadMessages(activeChatId);
-      }, 0);
-      return () => clearTimeout(timer);
+      }, 5000);
+      return () => clearInterval(interval);
     } else if (activeChatId === 'support') {
       setMessages([
         {

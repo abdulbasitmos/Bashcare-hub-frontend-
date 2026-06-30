@@ -110,7 +110,7 @@ const MeetingPortal = ({ user, role, exitPortal }) => {
       // Emit join meeting
       socket.emit('join_meeting', {
         roomCode: code,
-        userId: user.id,
+        userId: user.id || user._id,
         name: user.name,
         role: role,
         mic: micEnabled,
@@ -168,7 +168,7 @@ const MeetingPortal = ({ user, role, exitPortal }) => {
       setIsConnecting(true);
       await db.createMeeting({
         roomCode: randomCode,
-        hostName: user.name
+        hostName: user.name || 'System Admin'
       });
       setRoomCode(randomCode);
       connectToMeeting(randomCode);
@@ -460,12 +460,12 @@ const MeetingPortal = ({ user, role, exitPortal }) => {
       {meetingState === 'setup' && (
         <div className="flex-grow flex items-center justify-center p-6 relative">
           {/* Subtle background glow circles */}
-          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-50/500/10 rounded-full blur-3xl"></div>
+          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl"></div>
           <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl"></div>
 
           <div className="w-full max-w-md glass-panel p-8 rounded-[24px] shadow-2xl z-10 space-y-8">
             <div className="text-center">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-blue-50/500/10 text-blue-400 font-bold text-xs rounded-full uppercase tracking-wider mb-3">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-blue-500/10 text-blue-400 font-bold text-xs rounded-full uppercase tracking-wider mb-3">
                 <Radio size={12} className="animate-pulse" /> Live Clinical Meetings
               </span>
               <h1 className="text-3xl font-black tracking-tight">Staff Consult Room</h1>
